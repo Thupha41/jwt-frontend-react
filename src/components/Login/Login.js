@@ -36,8 +36,18 @@ const Login = (props) => {
   const handleLogin = async () => {
     if (isValidInput()) {
       let response = await loginUser(valueLogin, password);
-      let responseData = response.data;
-      toast.success("Login success!");
+      if (response && response.data && +response.data.EC === 1) {
+        let data = {
+          isAuthenticated: true,
+          token: "fake-token",
+        };
+        sessionStorage.setItem("account", JSON.stringify(data));
+        toast.success(response.data.EM);
+        history.push("/users");
+      }
+      if (response && response.data && +response.data.EC !== 1) {
+        toast.error(response.data.EM);
+      }
     } else {
       toast.error("Login failed");
     }
