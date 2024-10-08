@@ -90,6 +90,12 @@ const Register = (props) => {
     }
   };
 
+  const handlePressEvent = (event) => {
+    if (event.key === "Enter" && event.keyCode === 13) {
+      handleRegister();
+    }
+  };
+
   return (
     <div className="register-container mt-5">
       <div className="container">
@@ -163,6 +169,9 @@ const Register = (props) => {
                 placeholder="Re-enter Password"
                 value={confirmPassword}
                 onChange={(event) => setConfirmPassword(event.target.value)}
+                onKeyDown={(event) => {
+                  handlePressEvent(event);
+                }}
               />
             </div>
             {/* Register Button */}
