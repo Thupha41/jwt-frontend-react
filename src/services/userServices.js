@@ -26,4 +26,8 @@ const deleteUser = async (userId) => {
     `http://localhost:8080/api/v1/users/delete/${userId}`
   );
 };
-export { registerNewUser, loginUser, fetchAllUsers, deleteUser };
+
+const fetchAllRoles = async () => {
+  return await axios.get(`http://localhost:8080/api/v1/roles/read`);
+};
+export { registerNewUser, loginUser, fetchAllUsers, deleteUser, fetchAllRoles };
