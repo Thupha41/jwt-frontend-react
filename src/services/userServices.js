@@ -10,16 +10,20 @@ const registerNewUser = async (email, phone, username, password) => {
 };
 
 const loginUser = async (valueLogin, password) => {
-  return axios.post("http://localhost:8080/api/v1/login", {
+  return await axios.post("http://localhost:8080/api/v1/login", {
     valueLogin,
     password,
   });
 };
 
 const fetchAllUsers = async (page, limit) => {
-  return axios.get(
-    `http://localhost:8080/api/v1/user/read?page=${page}&limit=${limit}`
+  return await axios.get(
+    `http://localhost:8080/api/v1/users/read?page=${page}&limit=${limit}`
   );
 };
-
-export { registerNewUser, loginUser, fetchAllUsers };
+const deleteUser = async (userId) => {
+  return await axios.delete(
+    `http://localhost:8080/api/v1/users/delete/${userId}`
+  );
+};
+export { registerNewUser, loginUser, fetchAllUsers, deleteUser };
