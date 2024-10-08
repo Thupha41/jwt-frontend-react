@@ -30,4 +30,17 @@ const deleteUser = async (userId) => {
 const fetchAllRoles = async () => {
   return await axios.get(`http://localhost:8080/api/v1/roles/read`);
 };
-export { registerNewUser, loginUser, fetchAllUsers, deleteUser, fetchAllRoles };
+
+const createNewUser = async (userData) => {
+  return await axios.post(`http://localhost:8080/api/v1/users/create`, {
+    ...userData,
+  });
+};
+export {
+  registerNewUser,
+  loginUser,
+  fetchAllUsers,
+  deleteUser,
+  fetchAllRoles,
+  createNewUser,
+};

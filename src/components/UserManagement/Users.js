@@ -11,6 +11,7 @@ const Users = () => {
   const [currentLimit, setCurrentLimit] = useState(2);
   const [totalPages, setTotalPages] = useState(0);
   const [isShowModalDelete, setIsShowModalDelete] = useState(false);
+  const [isShowModalUser, setIsShowModalUser] = useState(false);
   const [dataModel, setDataModel] = useState({});
 
   useEffect(() => {
@@ -49,6 +50,11 @@ const Users = () => {
       toast.error(response.data.EM);
     }
   };
+
+  const onHideModalUser = () => {
+    setIsShowModalUser(false);
+  };
+
   return (
     <>
       <div className="container">
@@ -59,7 +65,12 @@ const Users = () => {
             </div>
             <div className="action">
               <button className="btn btn-success">Refresh</button>
-              <button className="btn btn-primary">Add new user</button>
+              <button
+                className="btn btn-primary"
+                onClick={() => setIsShowModalUser(true)}
+              >
+                Add new user
+              </button>
             </div>
           </div>
           {/* User table content */}
@@ -149,7 +160,11 @@ const Users = () => {
         confirmDeleteUser={confirmDeleteUser}
         dataModel={dataModel}
       />
-      <ModalUser title="Create new user" />
+      <ModalUser
+        title="Create new user"
+        isShowModalUser={isShowModalUser}
+        onHide={onHideModalUser}
+      />
     </>
   );
 };
