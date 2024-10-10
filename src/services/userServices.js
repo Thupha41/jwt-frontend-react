@@ -36,6 +36,12 @@ const createNewUser = async (userData) => {
     ...userData,
   });
 };
+
+const updateUser = async (id, userData) => {
+  return await axios.put(`http://localhost:8080/api/v1/users/update/${id}`, {
+    ...userData,
+  });
+};
 export {
   registerNewUser,
   loginUser,
@@ -43,4 +49,5 @@ export {
   deleteUser,
   fetchAllRoles,
   createNewUser,
+  updateUser,
 };

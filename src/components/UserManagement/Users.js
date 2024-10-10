@@ -5,15 +5,18 @@ import ReactPaginate from "react-paginate";
 import { toast } from "react-toastify";
 import ModalDelete from "./ModalDelete";
 import ModalUser from "./ModalUser";
+import { IoMdRefresh } from "react-icons/io";
+import { FaCirclePlus } from "react-icons/fa6";
 const Users = () => {
   const [listUsers, setListUsers] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [currentLimit, setCurrentLimit] = useState(2);
+  const [currentLimit, setCurrentLimit] = useState(5);
   const [totalPages, setTotalPages] = useState(0);
   const [isShowModalDelete, setIsShowModalDelete] = useState(false);
   const [isShowModalUser, setIsShowModalUser] = useState(false);
   const [dataModel, setDataModel] = useState({});
-
+  const [actionModalUser, setActionModalUser] = useState("CREATE");
+  const [dataModalUser, setDataModalUser] = useState({});
   useEffect(() => {
     fetchUsers();
   }, [currentPage]);
@@ -53,23 +56,46 @@ const Users = () => {
 
   const onHideModalUser = () => {
     setIsShowModalUser(false);
+    setDataModalUser({});
+    fetchUsers();
   };
 
+  const handleEditUser = (user) => {
+    setIsShowModalUser(true);
+    setActionModalUser("UPDATE");
+    setDataModalUser(user);
+  };
+
+  const handleAddNewUser = () => {
+    setIsShowModalUser(true);
+    setActionModalUser("CREATE");
+  };
+
+  const handleRefresh = async () => {
+    await fetchUsers();
+  };
   return (
     <>
       <div className="container">
         <div className="manage-users-container">
           <div className="user-header">
-            <div className="title">
-              <h3>Table Users</h3>
+            <div className="title my-4">
+              <h3>Manage Users</h3>
             </div>
-            <div className="action">
-              <button className="btn btn-success">Refresh</button>
+            <div className="action mr-4 my-3">
+              <button
+                className="btn btn-success"
+                onClick={() => handleRefresh()}
+              >
+                Refresh
+                <IoMdRefresh />
+              </button>
+
               <button
                 className="btn btn-primary"
-                onClick={() => setIsShowModalUser(true)}
+                onClick={() => handleAddNewUser()}
               >
-                Add new user
+                <FaCirclePlus /> Add new user
               </button>
             </div>
           </div>
@@ -92,13 +118,20 @@ const Users = () => {
                     {listUsers.map((user, index) => {
                       return (
                         <tr key={`row-${index}`}>
-                          <td>{index + 1}</td>
+                          <td>
+                            {(currentPage - 1) * currentLimit + index + 1}
+                          </td>
                           <td>{user.id}</td>
                           <td>{user.email}</td>
                           <td>{user.username}</td>
                           <td>{user.Role ? user.Role.name : ""}</td>
                           <td>
-                            <button className="btn btn-info" href="/">
+                            <button
+                              className="btn btn-info"
+                              onClick={() => {
+                                handleEditUser(user);
+                              }}
+                            >
                               Edit
                             </button>
                             {/* <form method="post" action=""> */}
@@ -161,9 +194,10 @@ const Users = () => {
         dataModel={dataModel}
       />
       <ModalUser
-        title="Create new user"
         isShowModalUser={isShowModalUser}
         onHide={onHideModalUser}
+        action={actionModalUser}
+        dataModalUser={dataModalUser}
       />
     </>
   );

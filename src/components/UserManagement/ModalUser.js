@@ -2,10 +2,15 @@ import React, { useEffect } from "react";
 import { useState } from "react";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
-import { fetchAllRoles, createNewUser } from "../../services/userServices";
+import {
+  fetchAllRoles,
+  createNewUser,
+  updateUser,
+} from "../../services/userServices";
 import { toast } from "react-toastify";
 import _ from "lodash";
 const ModalUser = (props) => {
+  const { action, dataModalUser } = props;
   const [userRoles, setUserRoles] = useState([]);
 
   const defaultUserData = {
@@ -24,6 +29,7 @@ const ModalUser = (props) => {
     isValidUsername: true,
     isValidAddress: true,
     isValidPassword: true,
+    isValidSex: true,
   };
 
   const [userData, setUserData] = useState(defaultUserData);
@@ -31,6 +37,23 @@ const ModalUser = (props) => {
   useEffect(() => {
     getRoles();
   }, []);
+
+  useEffect(() => {
+    if (action === "CREATE") {
+      if (userRoles && userRoles.length > 0) {
+        setUserData({ ...userData, role: userRoles[0].id });
+      }
+    }
+  }, [action, userRoles]);
+
+  useEffect(() => {
+    if (action === "UPDATE" && dataModalUser) {
+      setUserData({
+        ...dataModalUser,
+        role: dataModalUser.Role ? dataModalUser.Role.id : "",
+      });
+    }
+  }, [action, dataModalUser]);
 
   const getRoles = async () => {
     let response = await fetchAllRoles();
@@ -52,6 +75,7 @@ const ModalUser = (props) => {
   };
 
   const checkValidateInput = () => {
+    if (action === "UPDATE") return true;
     let newValidState = { ...validInputDefault };
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const phoneRegex = /^[0-9]{10,15}$/;
@@ -90,7 +114,10 @@ const ModalUser = (props) => {
     }
 
     // Validate Password
-    if (!userData.password || userData.password.length < 4) {
+    if (
+      action === "CREATE" &&
+      (!userData.password || userData.password.length < 4)
+    ) {
       newValidState.isValidPassword = false;
       setValidateInput(newValidState);
       toast.error(
@@ -98,14 +125,6 @@ const ModalUser = (props) => {
           ? "Password must be longer than 3 characters!"
           : "Please enter a password!"
       );
-      return false;
-    }
-
-    // Validate Role
-    if (!userData.role) {
-      newValidState.isValidRole = false;
-      setValidateInput(newValidState);
-      toast.error("Please select a role!");
       return false;
     }
 
@@ -128,20 +147,33 @@ const ModalUser = (props) => {
     setValidateInput(newValidState);
     return true;
   };
-
-  const handleCreateNewUser = async () => {
+  const handleConfirm = async () => {
     if (checkValidateInput()) {
       try {
-        let res = await createNewUser({ ...userData, roleId: userData.role });
-        console.log(">>> check response", res);
-
+        let res =
+          action === "CREATE"
+            ? await createNewUser({ ...userData, roleId: userData.role })
+            : await updateUser(userData.id, {
+                ...userData,
+                roleId: userData.role,
+              });
+        console.log(">>> chekc res", res);
         if (res.data && +res.data.EC === 1) {
           toast.success(res.data.EM);
           props.onHide();
           setUserData({ ...defaultUserData, role: userRoles[0]?.id });
+          setValidateInput(validInputDefault);
         } else if (res.data && +res.data.EC === 0) {
-          // Handle email or phone already exists
           toast.error(res.data.EM);
+
+          let _validInputs = { ...validInputDefault };
+          if (res.data.DT === "email") {
+            _validInputs.isValidEmail = false;
+          } else if (res.data.DT === "phone") {
+            _validInputs.isValidPhone = false;
+          }
+
+          setValidateInput(_validInputs);
         } else {
           toast.error(res.data.EM);
         }
@@ -169,7 +201,9 @@ const ModalUser = (props) => {
       >
         <Modal.Header closeButton>
           <Modal.Title id="contained-modal-title-vcenter">
-            <span>{props.title}</span>
+            <span>
+              {action === "CREATE" ? "Create new user" : "Edit a user"}
+            </span>
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
@@ -180,6 +214,7 @@ const ModalUser = (props) => {
                 Email (<span className="red">*</span>):
               </label>
               <input
+                disabled={action === "CREATE" ? false : true}
                 className={`form-control ${
                   !validateInput.isValidEmail ? "is-invalid" : ""
                 }`}
@@ -197,6 +232,7 @@ const ModalUser = (props) => {
                 Phone number (<span className="red">*</span>):
               </label>
               <input
+                disabled={action === "CREATE" ? false : true}
                 className={`form-control ${
                   !validateInput.isValidPhone ? "is-invalid" : ""
                 }`}
@@ -225,21 +261,27 @@ const ModalUser = (props) => {
               />
             </div>
             {/* Password */}
+
             <div className="col-12 col-sm-6 form-group">
-              <label>
-                Password (<span className="red">*</span>):
-              </label>
-              <input
-                className={`form-control ${
-                  !validateInput.isValidPassword ? "is-invalid" : ""
-                }`}
-                type="password"
-                value={userData.password}
-                onChange={(event) =>
-                  handleOnChangeInput(event.target.value, "password")
-                }
-              />
+              {action === "CREATE" && (
+                <>
+                  <label>
+                    Password (<span className="red">*</span>):
+                  </label>
+                  <input
+                    className={`form-control ${
+                      !validateInput.isValidPassword ? "is-invalid" : ""
+                    }`}
+                    type="password"
+                    value={userData.password}
+                    onChange={(event) =>
+                      handleOnChangeInput(event.target.value, "password")
+                    }
+                  />
+                </>
+              )}
             </div>
+
             {/* Sex */}
             <div className="col-12 col-sm-6 form-group">
               <label>Sex:</label>
@@ -265,9 +307,7 @@ const ModalUser = (props) => {
                 Role (<span className="red">*</span>):
               </label>
               <select
-                className={`form-select ${
-                  !validateInput.isValidRole ? "is-invalid" : ""
-                }`}
+                className="form-select"
                 value={userData.role}
                 onChange={(event) =>
                   handleOnChangeInput(event.target.value, "role")
@@ -290,7 +330,9 @@ const ModalUser = (props) => {
                 Address (<span className="red">*</span>):
               </label>
               <input
-                className="form-control"
+                className={`form-control ${
+                  !validateInput.isValidAddress ? "is-invalid" : ""
+                }`}
                 type="text"
                 value={userData.address}
                 onChange={(event) =>
@@ -304,8 +346,8 @@ const ModalUser = (props) => {
           <Button variant="secondary" onClick={props.onHide}>
             Close
           </Button>
-          <Button variant="primary" onClick={() => handleCreateNewUser()}>
-            Save
+          <Button variant="primary" onClick={() => handleConfirm()}>
+            {action === "CREATE" ? "Save" : "Update"}
           </Button>
         </Modal.Footer>
       </Modal>
