@@ -57,14 +57,14 @@ const ModalUser = (props) => {
 
   const getRoles = async () => {
     let response = await fetchAllRoles();
-    if (response && +response.data.EC === 1) {
-      setUserRoles(response.data.DT);
-      if (response.data.DT && response.data.DT.length > 0) {
-        let roles = response.data.DT;
+    if (response && +response.EC === 1) {
+      setUserRoles(response.DT);
+      if (response.DT && response.DT.length > 0) {
+        let roles = response.DT;
         setUserData({ ...userData, role: roles[0].id });
       }
     } else {
-      toast.error(response.data.EM);
+      toast.error(response.EM);
     }
   };
 
@@ -157,33 +157,35 @@ const ModalUser = (props) => {
                 ...userData,
                 roleId: userData.role,
               });
-        console.log(">>> chekc res", res);
-        if (res.data && +res.data.EC === 1) {
-          toast.success(res.data.EM);
+
+        if (res && +res.EC === 1) {
+          toast.success(res.EM);
           props.onHide();
           setUserData({ ...defaultUserData, role: userRoles[0]?.id });
           setValidateInput(validInputDefault);
-        } else if (res.data && +res.data.EC === 0) {
-          toast.error(res.data.EM);
+        } else if (res && +res.EC === 0) {
+          // Handle specific error cases like email or phone already exists
+          toast.error(res.EM);
 
           let _validInputs = { ...validInputDefault };
-          if (res.data.DT === "email") {
+          if (res.DT === "email") {
             _validInputs.isValidEmail = false;
-          } else if (res.data.DT === "phone") {
+          } else if (res.DT === "phone") {
             _validInputs.isValidPhone = false;
           }
 
           setValidateInput(_validInputs);
         } else {
-          toast.error(res.data.EM);
+          // Handle other errors that are returned by the server
+          toast.error(res.EM);
         }
       } catch (error) {
         // Handle network or server errors
-        if (error.response && error.response.data && error.response.data.EM) {
+        if (error.response && error.response.EM) {
           // Display error message returned from the backend
-          toast.error(error.response.data.EM);
+          toast.error(error.response.EM);
         } else {
-          // Display generic error message
+          // Display generic error message for any unexpected errors
           toast.error("Something went wrong. Please try again.");
         }
       }
