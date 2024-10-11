@@ -1,11 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import "./Login.scss";
 import { Link } from "react-router-dom";
 import { useHistory } from "react-router-dom";
 import { toast } from "react-toastify";
 import { loginUser } from "../../services/userServices";
-
+import { UserContext } from "../../context/UserContext";
 const Login = (props) => {
+  const { loginContext } = useContext(UserContext);
   let history = useHistory();
   const [valueLogin, setValueLogin] = useState("");
   const [password, setPassword] = useState("");
@@ -39,12 +40,18 @@ const Login = (props) => {
       if (response && +response.EC === 1) {
         let data = {
           isAuthenticated: true,
-          token: "fake-token",
+          token: response.DT.accessToken,
+          account: {
+            roles: response.DT.roles,
+            email: response.DT.email,
+            username: response.DT.username,
+          },
         };
         sessionStorage.setItem("account", JSON.stringify(data));
         toast.success(response.EM);
+        loginContext(data);
         history.push("/users");
-        window.location.reload();
+        // window.location.reload();
       }
       if (response && +response.EC !== 1) {
         toast.error(response.EM);
@@ -57,7 +64,6 @@ const Login = (props) => {
     if (event.key === "Enter" && event.keyCode === 13) {
       handleLogin();
     }
-    console.log(">>> check event", event);
   };
 
   useEffect(() => {
