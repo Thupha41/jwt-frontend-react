@@ -38,6 +38,10 @@ const updateUser = async (id, userData) => {
     ...userData,
   });
 };
+
+const getUserAccount = () => {
+  return axios.get(`/api/v1/account`);
+};
 export {
   registerNewUser,
   loginUser,
@@ -46,4 +50,5 @@ export {
   fetchAllRoles,
   createNewUser,
   updateUser,
+  getUserAccount,
 };

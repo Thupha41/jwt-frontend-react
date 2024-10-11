@@ -1,16 +1,48 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { getUserAccount } from "../services/userServices";
+const UserContext = React.createContext(null);
 
-const UserContext = React.createContext({ name: "", auth: false });
 const UserProvider = ({ children }) => {
-  const [user, setUser] = useState({
+  const defaultData = {
+    isLoading: true,
     isAuthenticated: false,
     token: "",
     account: {},
-  });
+  };
+
+  const [user, setUser] = useState(defaultData);
   const loginContext = (userData) => {
-    setUser(userData);
+    setUser({ ...userData, isLoading: false });
   };
   const logout = () => {};
+
+  const fetchUserAccount = async () => {
+    let response = await getUserAccount();
+    if (response && +response.EC === 1) {
+      let data = {
+        isAuthenticated: true,
+        token: response.DT.accessToken,
+        account: {
+          roles: response.DT.roles,
+          email: response.DT.email,
+          username: response.DT.username,
+        },
+        isLoading: false,
+      };
+      setUser(data);
+    } else {
+      setUser({ ...defaultData, isLoading: false });
+    }
+  };
+
+  useEffect(() => {
+    if (
+      window.location.pathname !== "/" ||
+      window.location.pathname !== "/login"
+    ) {
+      fetchUserAccount();
+    }
+  }, []);
   return (
     <UserContext.Provider value={{ user, loginContext, logout }}>
       {children}

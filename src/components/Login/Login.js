@@ -47,7 +47,6 @@ const Login = (props) => {
             username: response.DT.username,
           },
         };
-        sessionStorage.setItem("account", JSON.stringify(data));
         toast.success(response.EM);
         loginContext(data);
         history.push("/users");
@@ -66,13 +65,6 @@ const Login = (props) => {
     }
   };
 
-  useEffect(() => {
-    let session = sessionStorage.getItem("account");
-    if (session) {
-      history.push("/");
-      window.location.reload();
-    }
-  }, []);
   return (
     <div className="login-container mt-5">
       <div className="container">
