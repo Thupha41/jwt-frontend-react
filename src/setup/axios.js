@@ -6,7 +6,9 @@ const instance = axios.create({
   //   headers: { "X-Custom-Header": "foobar" },
 });
 instance.defaults.withCredentials = true;
-// instance.defaults.headers.common["Authorization"] = AUTH_TOKEN;
+instance.defaults.headers.common[
+  "Authorization"
+] = `Bearer ${localStorage.getItem("jwt")}`;
 // Add a request interceptor
 // instance.interceptors.request.use(
 //   function (config) {

@@ -48,6 +48,7 @@ const Login = (props) => {
           },
         };
         toast.success(response.EM);
+        localStorage.setItem("jwt", response.DT.accessToken);
         loginContext(data);
         history.push("/users");
         // window.location.reload();
