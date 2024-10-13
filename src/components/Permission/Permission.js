@@ -1,28 +1,33 @@
 import React, { useEffect } from "react";
-import "./Role.scss";
+import "./Permission.scss";
 import { FaPlusCircle } from "react-icons/fa";
 import { useState } from "react";
 import _ from "lodash";
 import { v4 as uuidv4 } from "uuid";
-const Role = () => {
+import { toast } from "react-toastify";
+import { createNewPermission } from "../../services/permissionService";
+const Permission = () => {
+  const dataChildDefault = {
+    url: "",
+    description: "",
+    isValidUrl: true,
+  };
+
   const [listChilds, setListChilds] = useState({
-    child: {
-      url: "",
-      description: "",
-    },
+    child: dataChildDefault,
   });
   const _listChilds = _.cloneDeep(listChilds);
 
   const handleOnChangeInput = (name, value, key) => {
     _listChilds[key][name] = value;
+    if (value && name === "url") {
+      _listChilds[key]["isValidUrl"] = true;
+    }
     setListChilds(_listChilds);
   };
 
   const handleAddNewRowInput = () => {
-    _listChilds[`child-${uuidv4()}`] = {
-      url: "",
-      description: "",
-    };
+    _listChilds[`child-${uuidv4()}`] = dataChildDefault;
     setListChilds(_listChilds);
   };
 
@@ -31,22 +36,57 @@ const Role = () => {
     setListChilds(_listChilds);
   };
 
+  const buildDataToPersist = () => {
+    let result = [];
+    Object.entries(listChilds).map(([key, child]) => {
+      result.push({
+        url: child.url,
+        description: child.description,
+      });
+    });
+    return result;
+  };
+  const handleSave = async () => {
+    console.log(listChilds);
+    let invalidObj = Object.entries(listChilds).find(([key, child]) => {
+      return child && !child.url;
+    });
+    console.log("check invalid", invalidObj);
+    if (!invalidObj) {
+      //call api
+      let data = buildDataToPersist();
+      let res = await createNewPermission(data);
+      if (res && +res.EC === 1) {
+        toast.success(res.EM);
+      } else if (res && +res.EC !== 1) {
+        toast.error(res.EM);
+      }
+    } else {
+      toast.error("URL input must not be empty");
+      const key = invalidObj[0];
+      _listChilds[key]["isValidUrl"] = false;
+      setListChilds(_listChilds);
+    }
+  };
+
   return (
-    <div className="role-container">
+    <div className="permission-container">
       <div className="container">
         <div className="mt-3">
-          <div className="title-role">
-            <h4>Add a new role</h4>
+          <div className="title-permission">
+            <h4>Add a new permission</h4>
           </div>
-          <div className="role-parent">
+          <div className="permission-parent">
             {Object.entries(listChilds).map(([key, child], index) => {
               return (
-                <div className="role-child row" key={`child-${key}`}>
+                <div className="permission-child row" key={`child-${key}`}>
                   <div className={`col-sm-5 col-12 form-group ${key}`}>
                     <label>URL:</label>
                     <input
                       type="text"
-                      className="form-control"
+                      className={`form-control ${
+                        !child.isValidUrl ? "is-invalid" : ""
+                      }`}
                       value={child.url}
                       onChange={(event) =>
                         handleOnChangeInput("url", event.target.value, key)
@@ -91,7 +131,14 @@ const Role = () => {
             })}
 
             <div>
-              <button className="btn btn-success mt-4">Save</button>
+              <button
+                className="btn btn-success mt-4"
+                onClick={() => {
+                  handleSave();
+                }}
+              >
+                Save
+              </button>
             </div>
           </div>
         </div>
@@ -100,4 +147,4 @@ const Role = () => {
   );
 };
 
-export default Role;
+export default Permission;

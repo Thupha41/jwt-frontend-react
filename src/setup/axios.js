@@ -51,14 +51,14 @@ instance.interceptors.response.use(
 
       // bad request
       case 400: {
-        toast.error("Error! Bad Request");
-        return Promise.reject(new APIError(err.message, 400));
+        // toast.error("Error! Bad Request");
+        return err.response.data;
       }
 
       // not found
       case 404: {
         toast.error("Error! Not found!");
-        return Promise.reject(new APIError(err.message, 404));
+        return err.response.data;
       }
 
       // conflict
