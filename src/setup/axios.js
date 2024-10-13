@@ -39,7 +39,7 @@ instance.interceptors.response.use(
     switch (status) {
       // authentication (token related issues)
       case 401: {
-        toast.error("Unauthorized user, please login");
+        toast.error("Unauthorized user!");
         return err.response.data;
       }
 

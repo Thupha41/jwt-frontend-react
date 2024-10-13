@@ -5,6 +5,7 @@ import Login from "../components/Login/Login";
 import Register from "../components/Register/Register";
 import Users from "../components/UserManagement/Users";
 import PrivateRoute from "./PrivateRoute";
+import Role from "../components/Role/Role";
 const AppRoute = () => {
   return (
     <>
@@ -19,6 +20,7 @@ const AppRoute = () => {
           <Register />
         </Route>
         <PrivateRoute path="/users" component={Users} />
+        <PrivateRoute path="/roles" component={Role} />
         <Route path="*">404 Not Found</Route>
       </Switch>
     </>
