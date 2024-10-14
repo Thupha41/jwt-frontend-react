@@ -20,7 +20,7 @@ const fetchAllUsers = async (page, limit) => {
   return await axios.get(`/api/v1/users/read?page=${page}&limit=${limit}`);
 };
 const deleteUser = async (userId) => {
-  return await axios.delete(`/api/v1/users/delete/${userId}`);
+  return await axios.delete(`/api/v1/users/delete`, { userId });
 };
 
 const fetchAllRoles = async () => {

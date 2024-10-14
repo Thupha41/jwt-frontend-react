@@ -1,7 +1,9 @@
 import axios from "../setup/axios";
 
-const fetchAllPermissions = async () => {
-  return await axios.get(`/api/v1/permissions/read`);
+const fetchAllPermissions = async (page, limit) => {
+  return await axios.get(
+    `/api/v1/permissions/read?page=${page}&limit=${limit}`
+  );
 };
 const deletePermission = async (userId) => {
   return await axios.delete(`/api/v1/permissions/delete/${userId}`);

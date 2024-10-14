@@ -82,7 +82,7 @@ const NavHeader = () => {
                     </>
                   ) : (
                     <Link className="nav-link" to="/login">
-                      Welcome, {user.account.username}!
+                      Login
                     </Link>
                   )}
                 </Nav>

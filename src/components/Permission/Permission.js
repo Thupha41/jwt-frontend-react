@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import "./Permission.scss";
 import { FaPlusCircle } from "react-icons/fa";
 import { useState } from "react";
@@ -6,7 +6,10 @@ import _ from "lodash";
 import { v4 as uuidv4 } from "uuid";
 import { toast } from "react-toastify";
 import { createNewPermission } from "../../services/permissionService";
+import TablePermission from "./TablePermission";
 const Permission = () => {
+  const childRef = useRef();
+
   const dataChildDefault = {
     url: "",
     description: "",
@@ -58,6 +61,7 @@ const Permission = () => {
       let res = await createNewPermission(data);
       if (res && +res.EC === 1) {
         toast.success(res.EM);
+        childRef.current.fetchChildListPermission();
       } else if (res && +res.EC !== 1) {
         toast.error(res.EM);
       }
@@ -72,7 +76,7 @@ const Permission = () => {
   return (
     <div className="permission-container">
       <div className="container">
-        <div className="mt-3">
+        <div className="adding-role mt-3">
           <div className="title-permission">
             <h4>Add a new permission</h4>
           </div>
@@ -141,6 +145,11 @@ const Permission = () => {
               </button>
             </div>
           </div>
+        </div>
+
+        <div className="list-role mt-3">
+          <h4>List current roles</h4>
+          <TablePermission ref={childRef} />
         </div>
       </div>
     </div>

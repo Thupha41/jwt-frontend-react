@@ -20,7 +20,6 @@ const Users = () => {
   useEffect(() => {
     fetchUsers();
   }, [currentPage]);
-
   const fetchUsers = async () => {
     let response = await fetchAllUsers(currentPage, currentLimit);
     if (response && +response.EC === 1) {
@@ -45,6 +44,7 @@ const Users = () => {
 
   const confirmDeleteUser = async () => {
     let response = await deleteUser(dataModel);
+    console.log(">>> check user id", dataModel);
     if (response && +response.EC === 1) {
       toast.success(response.EM);
       await fetchUsers();
