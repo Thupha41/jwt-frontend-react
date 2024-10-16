@@ -9,16 +9,18 @@ import ReactPaginate from "react-paginate";
 
 import {
   deletePermission,
-  fetchAllPermissions,
+  fetchPermissionsWithPaginate,
   updatePermission,
 } from "../../services/permissionService";
 import { toast } from "react-toastify";
+import ModalDelete from "../UserManagement/ModalDelete";
 const TablePermission = forwardRef((props, ref) => {
   const [listPermissions, setListPermissions] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [currentLimit, setCurrentLimit] = useState(5);
   const [totalPages, setTotalPages] = useState(0);
-
+  const [isShowModalDelete, setIsShowModalDelete] = useState(false);
+  const [dataModal, setDataModal] = useState({});
   useEffect(() => {
     fetchPermissions();
   }, [currentPage]);
@@ -29,7 +31,10 @@ const TablePermission = forwardRef((props, ref) => {
     },
   }));
   const fetchPermissions = async () => {
-    let response = await fetchAllPermissions(currentPage, currentLimit);
+    let response = await fetchPermissionsWithPaginate(
+      currentPage,
+      currentLimit
+    );
     if (response && +response.EC === 1) {
       setTotalPages(response.DT.totalPages);
       setListPermissions(response.DT.permissions);
@@ -40,14 +45,28 @@ const TablePermission = forwardRef((props, ref) => {
     setCurrentPage(+event.selected + 1);
   };
 
-  const handleDeletePermission = async (permission) => {
-    let res = await deletePermission(permission);
+  const handleClose = () => {
+    setIsShowModalDelete(false);
+    setDataModal({});
+  };
+
+  const handleDeletePermission = (permission) => {
+    setDataModal(permission);
+    setIsShowModalDelete(true);
+  };
+
+  const confirmDeletePermission = async () => {
+    let res = await deletePermission(dataModal);
     if (res && +res.EC === 1) {
+      setIsShowModalDelete(false);
       toast.success(res.EM);
       await fetchPermissions();
+      setIsShowModalDelete(false);
+    } else {
+      toast.error(res.EM);
     }
   };
-  console.log(">>>list permission", listPermissions);
+
   const handleEditPermission = async () => {
     // let res = await updatePermission();
   };
@@ -84,7 +103,6 @@ const TablePermission = forwardRef((props, ref) => {
                         >
                           Edit
                         </button>
-                        {/* <form method="post" action=""> */}
                         <button
                           className="btn btn-danger"
                           onClick={() => {
@@ -135,6 +153,14 @@ const TablePermission = forwardRef((props, ref) => {
           />
         )}
       </div>
+      <ModalDelete
+        title="Delete user"
+        body="user"
+        show={isShowModalDelete}
+        dataModel={dataModal}
+        handleClose={handleClose}
+        confirmDeleteUser={confirmDeletePermission}
+      />
     </>
   );
 });

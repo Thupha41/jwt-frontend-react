@@ -45,6 +45,9 @@ const NavHeader = () => {
                   <NavLink to="/permissions" className="nav-link">
                     Permissions
                   </NavLink>
+                  <NavLink to="/role-permission" className="nav-link">
+                    Assign Permissions
+                  </NavLink>
                   <NavLink to="/about" className="nav-link">
                     About
                   </NavLink>

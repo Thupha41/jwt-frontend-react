@@ -6,6 +6,7 @@ import Register from "../components/Register/Register";
 import Users from "../components/UserManagement/Users";
 import PrivateRoute from "./PrivateRoute";
 import Permission from "../components/Permission/Permission";
+import RolePermission from "../components/RolePermission/RolePermission";
 const AppRoute = () => {
   return (
     <>
@@ -21,6 +22,7 @@ const AppRoute = () => {
         </Route>
         <PrivateRoute path="/users" component={Users} />
         <PrivateRoute path="/permissions" component={Permission} />
+        <PrivateRoute path="/role-permission" component={RolePermission} />
         <Route path="*">404 Not Found</Route>
       </Switch>
     </>

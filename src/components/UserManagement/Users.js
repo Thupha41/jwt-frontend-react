@@ -44,7 +44,6 @@ const Users = () => {
 
   const confirmDeleteUser = async () => {
     let response = await deleteUser(dataModel);
-    console.log(">>> check user id", dataModel);
     if (response && +response.EC === 1) {
       toast.success(response.EM);
       await fetchUsers();
@@ -188,6 +187,8 @@ const Users = () => {
         </div>
       </div>
       <ModalDelete
+        title="Delete user"
+        body="user"
         show={isShowModalDelete}
         handleClose={handleClose}
         confirmDeleteUser={confirmDeleteUser}

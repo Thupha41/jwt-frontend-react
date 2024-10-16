@@ -1,9 +1,13 @@
 import axios from "../setup/axios";
 
-const fetchAllPermissions = async (page, limit) => {
+const fetchPermissionsWithPaginate = async (page, limit) => {
   return await axios.get(
     `/api/v1/permissions/read?page=${page}&limit=${limit}`
   );
+};
+
+const fetchAllPermissions = async () => {
+  return await axios.get(`/api/v1/permissions/read`);
 };
 const deletePermission = async (userId) => {
   return await axios.delete(`/api/v1/permissions/delete/${userId}`);
@@ -19,9 +23,15 @@ const updatePermission = async (id, userData) => {
   });
 };
 
+const fetchPermissionByRole = async (roleId) => {
+  return await axios.get(`/api/v1/roles/${roleId}/permissions`);
+};
+
 export {
   createNewPermission,
   updatePermission,
   deletePermission,
   fetchAllPermissions,
+  fetchPermissionsWithPaginate,
+  fetchPermissionByRole,
 };
