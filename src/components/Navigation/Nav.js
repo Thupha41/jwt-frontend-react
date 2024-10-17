@@ -68,7 +68,8 @@ const NavHeader = () => {
                   </NavDropdown>
                 </Nav>
                 <Nav>
-                  {user && user.isAuthenticated === true ? (
+                  {(user && user.isAuthenticated === true) ||
+                  location.pathname === "/" ? (
                     <>
                       <Nav.Item className="nav-link">
                         Welcome, {user.account.username}!

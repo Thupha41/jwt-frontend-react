@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import {
   fetchAllPermissions,
   fetchPermissionByRole,
+  assignPermissionsToRole,
 } from "../../services/permissionService";
 
 import _ from "lodash";
@@ -78,6 +79,31 @@ const RolePermission = () => {
     }
     setAssignPermissionByRole(_assignPermissionByRole);
   };
+  const buildDataToSave = () => {
+    let result = {};
+    const _assignPermissionByRole = _.cloneDeep(assignPermissionByRole);
+    result.roleId = selectRole;
+    let rolePermissions = _assignPermissionByRole.filter((item) => {
+      return item.isAssigned === true;
+    });
+
+    let finalRolePermissions = rolePermissions.map((item) => {
+      let final = { roleId: +selectRole, permissionId: +item.id };
+      return final;
+    });
+    result.rolePermissions = finalRolePermissions;
+    return result;
+  };
+  const handleSave = async () => {
+    let data = buildDataToSave();
+    console.log("check data", data);
+    let res = await assignPermissionsToRole(data);
+    if (res && +res.EC === 1) {
+      toast.success(res.EM);
+    } else {
+      toast.error(res.EM);
+    }
+  };
   return (
     <div className="assign-container">
       <div className="container">
@@ -142,7 +168,12 @@ const RolePermission = () => {
                   );
                 })}
               <div className="mt-3">
-                <button className="btn btn-warning"></button>
+                <button
+                  className="btn btn-warning"
+                  onClick={() => handleSave()}
+                >
+                  Save
+                </button>
               </div>
             </div>
           )}

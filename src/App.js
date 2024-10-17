@@ -9,6 +9,7 @@ import { Rings } from "react-loader-spinner";
 import { UserContext } from "./context/UserContext";
 function App() {
   const { user } = useContext(UserContext);
+
   return (
     <>
       <Router>

@@ -39,14 +39,20 @@ instance.interceptors.response.use(
     switch (status) {
       // authentication (token related issues)
       case 401: {
-        toast.error("Unauthorized user!");
+        if (
+          window.location.pathname !== "/" &&
+          window.location.pathname !== "/login"
+        ) {
+          toast.error("Unauthorized user!");
+        }
+
         return err.response.data;
       }
 
       // forbidden (permission related issues)
       case 403: {
         toast.error("You don't have permission to access this resource!");
-        return Promise.reject(new APIError(err.message, 403));
+        return err.response.data;
       }
 
       // bad request
@@ -64,18 +70,18 @@ instance.interceptors.response.use(
       // conflict
       case 409: {
         toast.error("Error with Conflict");
-        return Promise.reject(new APIError(err.message, 409));
+        return err.response.data;
       }
 
       // unprocessable
       case 422: {
         toast.error("Unprocessable!");
-        return Promise.reject(new APIError(err.message, 422));
+        return err.response.data;
       }
 
       // generic api error (server related) unexpected
       default: {
-        return Promise.reject(new APIError(err.message, 500));
+        return err.response.data;
       }
     }
   }

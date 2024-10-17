@@ -38,14 +38,15 @@ const UserProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    if (
-      window.location.pathname !== "/" &&
-      window.location.pathname !== "/login"
-    ) {
-      fetchUserAccount();
-    } else {
-      setUser({ ...user, isLoading: false });
-    }
+    // if (
+    //   window.location.pathname !== "/" &&
+    //   window.location.pathname !== "/login"
+    // ) {
+    //   fetchUserAccount();
+    // } else {
+    //   setUser({ ...user, isLoading: false });
+    // }
+    fetchUserAccount();
   }, []);
   return (
     <UserContext.Provider value={{ user, loginContext, logoutContext }}>

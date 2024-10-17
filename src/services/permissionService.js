@@ -27,6 +27,10 @@ const fetchPermissionByRole = async (roleId) => {
   return await axios.get(`/api/v1/roles/${roleId}/permissions`);
 };
 
+const assignPermissionsToRole = async (data) => {
+  return axios.post(`/api/v1/permissions/assign-to-role`, { data });
+};
+
 export {
   createNewPermission,
   updatePermission,
@@ -34,4 +38,5 @@ export {
   fetchAllPermissions,
   fetchPermissionsWithPaginate,
   fetchPermissionByRole,
+  assignPermissionsToRole,
 };
